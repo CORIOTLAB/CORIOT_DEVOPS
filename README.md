@@ -1,3 +1,17 @@
+# Plataforma IoT – Arquitectura LoRaWAN + WiFi
+
+Este proyecto describe la arquitectura de una plataforma IoT diseñada para integrar dispositivos **LoRaWAN** y **WiFi** en un mismo sistema de ingestión, procesamiento y consulta de datos.
+
+La plataforma utiliza **ChirpStack** para la gestión de la red LoRaWAN y **EMQX** como broker MQTT para dispositivos WiFi. Ambos flujos de datos convergen en un **servicio de ingestión**, encargado de decodificar, validar y almacenar la telemetría en una base de datos unificada.
+
+El objetivo de esta arquitectura es separar claramente:
+
+- la **infraestructura de red LoRaWAN**
+- la **plataforma de procesamiento IoT**
+- las **APIs de consulta de datos**
+
+permitiendo escalar cada componente de forma independiente.
+
 ## Arquitectura general
 
 La siguiente figura muestra la arquitectura general de la plataforma IoT. El sistema integra dos fuentes principales de datos: dispositivos **LoRaWAN** y dispositivos **WiFi**. El subsistema LoRaWAN se basa en **ChirpStack**, que gestiona gateways y dispositivos, utilizando Mosquitto como broker MQTT interno, Redis para el manejo de estado del servidor de red y una base de datos PostgreSQL para la persistencia de su configuración. Los mensajes de telemetría procesados por el LNS son publicados en MQTT y consumidos por el **IngestorServer**, el cual también recibe datos provenientes de dispositivos WiFi a través del broker **EMQX**. Este servicio se encarga de decodificar, validar y normalizar los mensajes antes de almacenarlos en la base de datos de la plataforma (`iot_postgres`). La base de datos contiene dos esquemas (`lora` y `wifi`) que organizan la telemetría según el origen del dispositivo. Finalmente, las APIs (`API_LORA` y `API_WIFI`) exponen los datos para su consulta por aplicaciones, dashboards y otros servicios.
